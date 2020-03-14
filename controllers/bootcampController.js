@@ -6,7 +6,17 @@ const geocoder = require("../utils/geocode");
 // @route    GET /api/v1/bootcamps
 // @access   Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find();
+  let query;
+
+  //Will take the query as an object -> convert it to string -> using regex will return match with the $ symbol. That way, filtering will work just fine!
+  let queryStr = JSON.stringify(req.query).replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    match => `$${match}`
+  );
+
+  //Query bootcamp to find results with the query
+  query = Bootcamp.find(JSON.parse(queryStr));
+  const bootcamps = await query;
 
   res.status(200).json({
     success: true,
