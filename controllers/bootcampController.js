@@ -6,17 +6,39 @@ const geocoder = require("../utils/geocode");
 // @route    GET /api/v1/bootcamps
 // @access   Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  let query;
+  //copy req.query
+  let data;
+  let query = { ...req.query };
 
-  //Will take the query as an object -> convert it to string -> using regex will return match with the $ symbol. That way, filtering will work just fine!
-  let queryStr = JSON.stringify(req.query).replace(
+  //Fields to exclude
+  const removeFields = ["select", "sort"];
+
+  //Loop over removeFields and delete them from query
+  removeFields.forEach(param => delete query[param]);
+
+  //Will take the query as an object -> convert it to string -> using regex to create opertatos ex: {$gt}. That way, filtering will work just fine!
+  let queryStr = JSON.stringify(query).replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     match => `$${match}`
   );
+  //Find resources
+  data = Bootcamp.find(JSON.parse(queryStr));
 
+  // Select fields
+  if (req.query.select) {
+    //Replace the commas to spaces
+    const selecetValues = req.query.select.split(",").join(" ");
+    data = data.select(selecetValues);
+  }
+
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    data = data.sort(sortBy);
+  } else {
+    data = data.sort("-createdAt");
+  }
   //Query bootcamp to find results with the query
-  query = Bootcamp.find(JSON.parse(queryStr));
-  const bootcamps = await query;
+  const bootcamps = await data;
 
   res.status(200).json({
     success: true,
