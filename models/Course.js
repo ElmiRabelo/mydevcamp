@@ -18,8 +18,8 @@ const CourseSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Adicione o custo do curso"]
   },
-  minimunSkill: {
-    type: [String],
+  minimumSkill: {
+    type: String,
     required: [
       true,
       "Adicione as habilidades e conhecimentos necessários para poder participar"

@@ -8,7 +8,14 @@ const {
   deleteBootcamp
 } = require("../controllers/bootcampController");
 
+//Incluir recursos de outra rota
+const courseRoute = require("./courseRoutes");
+
+//Inicilizar Router
 const router = Router();
+
+//Refazer rota especifica em outra rota = quando atingir esse endereço courseRoute vai ter o controle
+router.use("/:bootcampId/courses", courseRoute);
 
 router
   .route("/")
