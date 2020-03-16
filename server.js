@@ -1,6 +1,8 @@
+const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv").config({ path: "./config/.env" });
 const connectDB = require("./config/db");
+const fileupload = require("express-fileupload");
 const morgan = require("morgan");
 const colors = require("colors");
 const errorHandler = require("./middlewares/error");
@@ -17,6 +19,11 @@ const app = express();
 // Middlewares
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 app.use(express.json());
+
+//File uploading
+app.use(fileupload());
+// Setando pasta estatica
+app.use(express.static(path.join(__dirname, "public")));
 
 // Mount Routers
 app.use("/api/v1/bootcamps", bootcamps);

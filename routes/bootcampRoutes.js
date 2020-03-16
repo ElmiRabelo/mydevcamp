@@ -5,7 +5,8 @@ const {
   getBootcampsInRadius,
   createBootcamp,
   updateBootcamp,
-  deleteBootcamp
+  deleteBootcamp,
+  bootcampFileUpload
 } = require("../controllers/bootcampController");
 
 //Incluir recursos de outra rota
@@ -16,6 +17,8 @@ const router = Router();
 
 //Se rota for igual a esses valores, courseRoute será invocado e assumirá controle
 router.use("/:bootcampId/courses", courseRoute);
+
+router.route("/:id/photo").put(bootcampFileUpload);
 
 router
   .route("/")
