@@ -8,73 +8,7 @@ const ErrorResponse = require("../utils/errorResponse");
 // @route    GET /api/v1/bootcamps
 // @access   Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  //copy req.query
-  let data;
-  let query = { ...req.query };
-
-  //Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit"];
-
-  //Loop over removeFields and delete them from query
-  removeFields.forEach(param => delete query[param]);
-
-  //Will take the query as an object -> convert it to string -> using regex to create opertatos ex: {$gt}. That way, filtering will work just fine!
-  let queryStr = JSON.stringify(query).replace(
-    /\b(gt|gte|lt|lte|in)\b/g,
-    match => `$${match}`
-  );
-  //Find resources
-  data = Bootcamp.find(JSON.parse(queryStr)).populate("courses");
-
-  // Select fields
-  if (req.query.select) {
-    //Replace the commas to spaces
-    const selecetValues = req.query.select.split(",").join(" ");
-    data = data.select(selecetValues);
-  }
-
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(",").join(" ");
-    data = data.sort(sortBy);
-  } else {
-    data = data.sort("-createdAt");
-  }
-
-  //Pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 25;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const total = await Bootcamp.countDocuments();
-
-  data = data.skip(startIndex).limit(limit);
-
-  //Executing the action
-  const bootcamps = await data;
-
-  //pagination result
-  const pagination = {};
-
-  if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit
-    };
-  }
-
-  if (startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit
-    };
-  }
-
-  res.status(200).json({
-    success: true,
-    count: bootcamps.length,
-    pagination,
-    data: bootcamps
-  });
+  res.status(200).json(res.advancedResults);
 });
 
 // @desc     Get bootcamp

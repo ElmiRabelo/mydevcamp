@@ -9,15 +9,16 @@ const ErrorResponse = require("../utils/errorResponse");
 // @access   Public
 exports.getCourses = asyncHandler(async (req, res, next) => {
   const { bootcampId } = req.params;
-  let query;
 
   if (bootcampId) {
-    query = Course.find({ bootcamp: bootcampId });
-  } else {
-    query = Course.find().populate({
-      path: "bootcamp",
-      select: "name description"
+    const courses = await Course.find({ bootcamp: bootcampId });
+    res.status(200).json({
+      success: true,
+      count: courses.length,
+      data: courses
     });
+  } else {
+    res.status(200).json(res.advancedResults);
   }
 
   const courses = await query;

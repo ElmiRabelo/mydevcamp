@@ -7,12 +7,22 @@ const {
   deleteCourse
 } = require("../controllers/courseController");
 
+const Course = require("../models/Course");
+//Middleware de resultados avançados
+const advancedResults = require("../middlewares/advancedResults");
+
 //Preseva os valores de req.params da 'rota pai'. Nesse caso, de /:bootcampId/courses
 const router = Router({ mergeParams: true });
 
 router
   .route("/")
-  .get(getCourses)
+  .get(
+    advancedResults(Course, {
+      path: "bootcamps",
+      select: "name description"
+    }),
+    getCourses
+  )
   .post(addCourse);
 
 router
