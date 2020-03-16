@@ -2,7 +2,9 @@ const { Router } = require("express");
 const {
   getCourses,
   getCourse,
-  addCourse
+  addCourse,
+  updateCourse,
+  deleteCourse
 } = require("../controllers/courseController");
 
 //Preseva os valores de req.params da 'rota pai'. Nesse caso, de /:bootcampId/courses
@@ -13,6 +15,9 @@ router
   .get(getCourses)
   .post(addCourse);
 
-router.route("/:id").get(getCourse);
-
+router
+  .route("/:id")
+  .get(getCourse)
+  .put(updateCourse)
+  .delete(deleteCourse);
 module.exports = router;
