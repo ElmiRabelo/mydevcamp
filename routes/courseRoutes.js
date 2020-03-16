@@ -1,9 +1,18 @@
 const { Router } = require("express");
-const { getCourses } = require("../controllers/courseController");
+const {
+  getCourses,
+  getCourse,
+  addCourse
+} = require("../controllers/courseController");
 
-//Possibilita controlar rotas especificas de outros recursos/rotas
+//Preseva os valores de req.params da 'rota pai'. Nesse caso, de /:bootcampId/courses
 const router = Router({ mergeParams: true });
 
-router.route("/").get(getCourses);
+router
+  .route("/")
+  .get(getCourses)
+  .post(addCourse);
+
+router.route("/:id").get(getCourse);
 
 module.exports = router;

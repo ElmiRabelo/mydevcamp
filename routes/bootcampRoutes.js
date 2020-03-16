@@ -14,7 +14,7 @@ const courseRoute = require("./courseRoutes");
 //Inicilizar Router
 const router = Router();
 
-//Refazer rota especifica em outra rota = quando atingir esse endereço courseRoute vai ter o controle
+//Se rota for igual a esses valores, courseRoute será invocado e assumirá controle
 router.use("/:bootcampId/courses", courseRoute);
 
 router

@@ -1,4 +1,5 @@
 const Course = require("../models/Course");
+const Bootcamp = require("../models/Bootcamp");
 const asyncHandler = require("../middlewares/async");
 const ErrorResponse = require("../utils/errorResponse");
 
@@ -13,7 +14,10 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   if (bootcampId) {
     query = Course.find({ bootcamp: bootcampId });
   } else {
-    query = Course.find();
+    query = Course.find().populate({
+      path: "bootcamp",
+      select: "name description"
+    });
   }
 
   const courses = await query;
@@ -21,5 +25,51 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
     success: true,
     count: courses.length,
     data: courses
+  });
+});
+
+// @desc     Get single course
+// @route    GET /api/v1/courses
+// @access   Public
+exports.getCourse = asyncHandler(async (req, res, next) => {
+  const course = await Course.findById(req.params.id).populate({
+    path: "bootcamp",
+    select: "name description"
+  });
+
+  if (!course) {
+    return next(
+      new ErrorResponse(`Nenhum curso com a id de ${req.params.id}`),
+      404
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    data: course
+  });
+});
+
+// @desc     Create course
+// @route    POST /api/v1/bootcamps/:bootcampId/courses
+// @access   Private
+exports.addCourse = asyncHandler(async (req, res, next) => {
+  const { bootcampId } = req.params;
+  req.body.bootcamp = bootcampId;
+
+  const bootcamp = await Bootcamp.findById(bootcampId);
+
+  if (!bootcamp) {
+    return next(
+      new ErrorResponse(`Nenhum bootcamp com a id de ${bootcampId}`),
+      404
+    );
+  }
+
+  const course = await Course.create(req.body);
+
+  res.status(200).json({
+    success: true,
+    data: course
   });
 });
