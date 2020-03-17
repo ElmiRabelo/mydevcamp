@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const Bootcamp = require("../models/Bootcamp");
 const {
   getBootcamps,
   getBootcamp,
@@ -8,8 +9,8 @@ const {
   deleteBootcamp,
   bootcampFileUpload
 } = require("../controllers/bootcampController");
+const { protect } = require("../middlewares/auth");
 
-const Bootcamp = require("../models/Bootcamp");
 //Middleware de recursos avançados
 const advancedResults = require("../middlewares/advancedResults");
 
@@ -22,18 +23,19 @@ const router = Router();
 //Se rota for igual a esses valores, courseRoute será invocado e assumirá controle
 router.use("/:bootcampId/courses", courseRoute);
 
-router.route("/:id/photo").put(bootcampFileUpload);
+//Rota de upload de foto
+router.route("/:id/photo").put(protect, bootcampFileUpload);
 
 router
   .route("/")
   .get(advancedResults(Bootcamp, "courses"), getBootcamps)
-  .post(createBootcamp);
+  .post(protect, createBootcamp);
 
 router
   .route("/:id")
   .get(getBootcamp)
-  .put(updateBootcamp)
-  .delete(deleteBootcamp);
+  .put(protect, updateBootcamp)
+  .delete(protect, deleteBootcamp);
 
 router.route("/radius/:zipcode/:distance").get(getBootcampsInRadius);
 

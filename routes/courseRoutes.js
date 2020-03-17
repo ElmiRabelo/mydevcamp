@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const Course = require("../models/Course");
 const {
   getCourses,
   getCourse,
@@ -6,8 +7,8 @@ const {
   updateCourse,
   deleteCourse
 } = require("../controllers/courseController");
+const { protect } = require("../middlewares/auth");
 
-const Course = require("../models/Course");
 //Middleware de resultados avançados
 const advancedResults = require("../middlewares/advancedResults");
 
@@ -23,11 +24,11 @@ router
     }),
     getCourses
   )
-  .post(addCourse);
+  .post(protect, addCourse);
 
 router
   .route("/:id")
   .get(getCourse)
-  .put(updateCourse)
-  .delete(deleteCourse);
+  .put(protect, updateCourse)
+  .delete(protect, deleteCourse);
 module.exports = router;
