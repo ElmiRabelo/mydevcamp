@@ -11,6 +11,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   const { bootcampId } = req.params;
 
   if (bootcampId) {
+    //Retorna cursos de um determinado bootcamp
     const courses = await Course.find({ bootcamp: bootcampId });
     res.status(200).json({
       success: true,
@@ -18,6 +19,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
       data: courses
     });
   } else {
+    //Traz os cursos de acordo com os filtros ou todos os cursos sem filtro
     res.status(200).json(res.advancedResults);
   }
 
