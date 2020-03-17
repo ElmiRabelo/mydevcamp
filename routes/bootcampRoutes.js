@@ -9,7 +9,7 @@ const {
   deleteBootcamp,
   bootcampFileUpload
 } = require("../controllers/bootcampController");
-const { protect } = require("../middlewares/auth");
+const { protect, authorize } = require("../middlewares/auth");
 
 //Middleware de recursos avançados
 const advancedResults = require("../middlewares/advancedResults");
@@ -24,18 +24,20 @@ const router = Router();
 router.use("/:bootcampId/courses", courseRoute);
 
 //Rota de upload de foto
-router.route("/:id/photo").put(protect, bootcampFileUpload);
+router
+  .route("/:id/photo")
+  .put(protect, authorize("publisher", "admin"), bootcampFileUpload);
 
 router
   .route("/")
   .get(advancedResults(Bootcamp, "courses"), getBootcamps)
-  .post(protect, createBootcamp);
+  .post(protect, authorize("publisher", "admin"), createBootcamp);
 
 router
   .route("/:id")
   .get(getBootcamp)
-  .put(protect, updateBootcamp)
-  .delete(protect, deleteBootcamp);
+  .put(protect, authorize("publisher", "admin"), updateBootcamp)
+  .delete(protect, authorize("publisher", "admin"), deleteBootcamp);
 
 router.route("/radius/:zipcode/:distance").get(getBootcampsInRadius);
 

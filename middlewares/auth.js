@@ -38,3 +38,19 @@ exports.protect = asyncHandler(async (req, res, next) => {
     );
   }
 });
+
+//Garantir acesso a uma role especifica
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    //verificando no user já logado pois possui as informações em req.user
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new ErrorResponse(
+          `O tipo de usuário ${req.user.role} não é autorizada para essa ação`,
+          403
+        )
+      );
+    }
+    next();
+  };
+};
