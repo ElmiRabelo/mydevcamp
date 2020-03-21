@@ -8,6 +8,7 @@ const asyncHandler = require("../middlewares/async");
 exports.register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body;
 
+  //Criando user no banco de dados
   const user = await User.create({
     name,
     email,
@@ -36,7 +37,8 @@ exports.login = asyncHandler(async (req, res, next) => {
   }
 
   //Checar usuário
-  const user = await User.findOne({ email: email }).select("+password");
+  const user = await User.findOne({ email }).select("+password");
+  console.log(user);
 
   if (!user) {
     return next(new ErrorResponse("Informações invalidas", 401));

@@ -9,7 +9,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   let token;
 
   if (authorization && authorization.startsWith("Bearer")) {
-    //Pegando o token
+    //Pega somente a parte do token, cortando o Bearer
     token = authorization.split(" ")[1];
   }
   // else if (req.cookies.token) {
@@ -24,7 +24,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     );
   }
 
-  //Verificando token e obtendo o token
+  //Verificando se o token é valido e obtendo o token
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
