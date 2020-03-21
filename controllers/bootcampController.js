@@ -23,6 +23,18 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @route    POST /api/v1/bootcamps
 // @access   Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
+  const { id, role } = req.user;
+  // Como é uma rota privada existe acesso a req.user que é o usuário logado.
+  req.body.user = id;
+
+  //Verificar bootcamp já publicado
+  const publishedBootcamp = await Bootcamp.findOne({ user: id });
+  //
+  if (publishedBootcamp && role !== "admin") {
+    return next(
+      new ErrorResponse(`O usuário de id ${id} já cadastrou um bootcamp`, 400)
+    );
+  }
   const bootcamp = await Bootcamp.create(req.body);
 
   res.status(201).json({

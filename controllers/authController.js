@@ -36,7 +36,9 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Digite um email e password válidos", 400));
   }
 
-  //Checar usuário
+  //Checar se usuário são iguais.
+  //Select está presente pois no model ele foi definido pra false
+  //Assim se eu não especificar o password ele retorna o user sem esse campo
   const user = await User.findOne({ email }).select("+password");
   console.log(user);
 
@@ -51,7 +53,7 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Informações invalidas", 401));
   }
 
-  //Criar token
+  //Gera o token
   const token = user.getSignedJwtToken();
 
   res.status(200).json({

@@ -24,7 +24,8 @@ exports.protect = asyncHandler(async (req, res, next) => {
     );
   }
 
-  //Verificando se o token é valido e obtendo o token
+  //Verificando se o token é valido
+  //E cria no em req o valor de user
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
