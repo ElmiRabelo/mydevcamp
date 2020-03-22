@@ -29,12 +29,14 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 
   //Verificar bootcamp já publicado
   const publishedBootcamp = await Bootcamp.findOne({ user: id });
-  //
+
+  //Impede que publisher adicione mais de um bootcamp
   if (publishedBootcamp && role !== "admin") {
     return next(
       new ErrorResponse(`O usuário de id ${id} já cadastrou um bootcamp`, 400)
     );
   }
+
   const bootcamp = await Bootcamp.create(req.body);
 
   res.status(201).json({
@@ -48,7 +50,20 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 // @route    PUT /api/v1/bootcamps/:id
 // @access   Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+  let bootcamp = await Bootcamp.findById(req.params.id);
+
+  //Garantido que a operação só possa ser realizada pelo responsavel do bootcamp
+  //O admin tem autoridade de realizar a operação
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `${req.user.name} não é o responsável por essa operação`,
+        400
+      )
+    );
+  }
+
+  bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
   });
@@ -61,6 +76,17 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @access   Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.id);
+
+  //Garantido que a operação só possa ser realizada pelo responsavel do bootcamp
+  //O admin tem autoridade de realizar a operação
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `${req.user.name} não é o responsável por essa operação`,
+        400
+      )
+    );
+  }
 
   bootcamp.remove();
 
@@ -103,6 +129,17 @@ exports.bootcampFileUpload = asyncHandler(async (req, res, next) => {
       new ErrorResponse(
         `Não foi possível encontrar bootcamp de id ${req.params.id}`,
         404
+      )
+    );
+  }
+
+  //Garantido que a operação só possa ser realizada pelo responsavel do bootcamp
+  //O admin tem autoridade de realizar a operação
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `${req.user.name} não é o responsável por essa operação`,
+        400
       )
     );
   }
