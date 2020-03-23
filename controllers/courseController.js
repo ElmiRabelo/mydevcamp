@@ -59,6 +59,7 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 exports.addCourse = asyncHandler(async (req, res, next) => {
   const { bootcampId } = req.params;
   req.body.bootcamp = bootcampId;
+  req.body.user = req.user.id;
 
   const bootcamp = await Bootcamp.findById(bootcampId);
 
@@ -66,6 +67,17 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`Nenhum bootcamp com a id de ${bootcampId}`),
       404
+    );
+  }
+
+  //Garantido que a operação só possa ser realizada pelo responsavel do bootcamp
+  //O admin tem autoridade de realizar a operação
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `${req.user.name} não é o responsável por essa operação`,
+        400
+      )
     );
   }
 
@@ -92,6 +104,17 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
     );
   }
 
+  //Garantido que a operação só possa ser realizada pelo responsavel do bootcamp
+  //O admin tem autoridade de realizar a operação
+  if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `${req.user.name} não é o responsável por essa operação`,
+        400
+      )
+    );
+  }
+
   course = await Course.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true
@@ -113,6 +136,17 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     return next(
       new ErrorResponse(`Nenhum curso com a id de ${bootcampId}`),
       404
+    );
+  }
+
+  //Garantido que a operação só possa ser realizada pelo responsavel do bootcamp
+  //O admin tem autoridade de realizar a operação
+  if (course.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `${req.user.name} não é o responsável por essa operação`,
+        400
+      )
     );
   }
 
